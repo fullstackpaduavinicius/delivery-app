@@ -1,46 +1,115 @@
-# Getting Started with Create React App
+🍔 Food Delivery App – Seu sistema de pedidos online moderno
+Um app completo de delivery de alimentos, inspirado no iFood, desenvolvido com React + TypeScript, focado em oferecer uma experiência moderna, intuitiva e responsiva para o usuário.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+🔥 Principais Funcionalidades
+✅ Catálogo organizado por categorias
+Lanches, Pizzas, Bebidas… tudo separado pra facilitar a escolha.
 
-## Available Scripts
+✅ Carrinho inteligente
+Adicione, remova e ajuste quantidades com facilidade.
 
-In the project directory, you can run:
+✅ Checkout completo
 
-### `npm start`
+Informações do cliente (nome, endereço, telefone)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Várias formas de pagamento: Cartão, PIX, Dinheiro
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Opção para informar troco, se for pagar em espécie
 
-### `npm test`
+✅ Integração com WhatsApp
+O pedido é enviado automaticamente por mensagem. Prático e direto!
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+✅ Design responsivo (mobile-first)
+Pensado para funcionar perfeitamente em qualquer dispositivo, com foco total na usabilidade.
 
-### `npm run build`
+🛠 Tecnologias Utilizadas
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Frontend	Backend (simulado)	Ferramentas Extras
+React 18	JSON (Mock)	TypeScript, Styled Components
+React Router v6		Formik + Yup, Context API
+React Icons		Webpack
+🚀 Como rodar o projeto
+✅ Pré-requisitos
+Node.js v16 ou superior
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+npm ou yarn
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+📦 Instalação
+bash
+Copiar
+Editar
+git clone https://github.com/seu-usuario/food-delivery-app.git
+cd food-delivery-app
+npm install # ou yarn install
+▶️ Iniciar o projeto
+bash
+Copiar
+Editar
+npm start # ou yarn start
+Depois disso, acesse:
+🌐 http://localhost:3000
 
-### `npm run eject`
+📂 Estrutura de Pastas
+bash
+Copiar
+Editar
+src/
+├── assets/             # Imagens e arquivos estáticos
+├── components/         # Componentes reutilizáveis
+│   ├── Header.tsx
+│   ├── ProductCard.tsx
+│   └── ...
+├── pages/              # Páginas principais
+│   ├── Home.tsx
+│   ├── Cart.tsx
+│   └── Checkout.tsx
+├── contexts/           # Contexto global (ex: Carrinho)
+├── types/              # Tipagens com TypeScript
+└── ...
+⚙️ Personalização
+✏️ Personalização rápida:
+Produtos: edite o conteúdo em src/pages/Home.tsx
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Imagens: adicione em src/assets/images/ e atualize as referências
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+WhatsApp: altere o número em src/pages/Checkout.tsx
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+📁 Variáveis de ambiente
+Crie um arquivo .env na raiz com o seguinte conteúdo:
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+env
+Copiar
+Editar
+REACT_APP_WHATSAPP_NUMBER=5511999999999
+📸 Preview da Interface
+Página Inicial
 
-## Learn More
+Carrinho
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Checkout
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+(adicione prints se quiser deixar mais visual)
+
+🤝 Quer contribuir?
+Faça um fork do repositório
+
+Crie sua branch:
+
+bash
+Copiar
+Editar
+git checkout -b minha-feature
+Faça suas alterações e commit:
+
+bash
+Copiar
+Editar
+git commit -m 'feat: Minha nova feature'
+Suba sua branch:
+
+bash
+Copiar
+Editar
+git push origin minha-feature
+Abra um Pull Request e pronto! 🚀
+
