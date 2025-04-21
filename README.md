@@ -49,23 +49,7 @@ npm start # ou yarn start
 Depois disso, acesse:
 🌐 http://localhost:3000
 
-📂 Estrutura de Pastas
-bash
-Copiar
-Editar
-src/
-├── assets/             # Imagens e arquivos estáticos
-├── components/         # Componentes reutilizáveis
-│   ├── Header.tsx
-│   ├── ProductCard.tsx
-│   └── ...
-├── pages/              # Páginas principais
-│   ├── Home.tsx
-│   ├── Cart.tsx
-│   └── Checkout.tsx
-├── contexts/           # Contexto global (ex: Carrinho)
-├── types/              # Tipagens com TypeScript
-└── ...
+
 ⚙️ Personalização
 ✏️ Personalização rápida:
 Produtos: edite o conteúdo em src/pages/Home.tsx
