@@ -72,7 +72,6 @@ Carrinho
 
 Checkout
 
-(adicione prints se quiser deixar mais visual)
 
 🤝 Quer contribuir?
 Faça um fork do repositório
