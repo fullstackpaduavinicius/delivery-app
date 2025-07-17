@@ -9,7 +9,7 @@
   ],
   "build": {
     "env": {
-      "NODE_VERSION": "18.x"  // Ajusta pra versão que teu projeto precisa
+      "NODE_VERSION": "18.x"  
     }
   }
 }
