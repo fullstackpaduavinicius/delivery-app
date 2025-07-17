@@ -1,63 +1,108 @@
-// src/hooks/useProductStore.ts
 import { useState, useEffect } from 'react';
 import { Product } from '../types';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-const WS_URL = process.env.REACT_APP_WS_URL || 'ws://localhost:3002';
+// Configurações específicas para produção
+const PRODUCTION_CONFIG = {
+  API_URL: process.env.REACT_APP_API_URL,
+  WS_URL: process.env.REACT_APP_WS_URL,
+  RECONNECT_DELAY: 5000, // 5 segundos
+  MAX_RECONNECT_ATTEMPTS: 5
+};
 
 const useProductStore = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
-  // Conexão WebSocket para atualizações em tempo real
+  // Conexão WebSocket robusta para produção
   useEffect(() => {
-    const ws = new WebSocket(WS_URL);
+    const connectWebSocket = () => {
+      if (reconnectAttempts >= PRODUCTION_CONFIG.MAX_RECONNECT_ATTEMPTS) {
+        console.error('Número máximo de tentativas de reconexão atingido');
+        return;
+      }
 
-    ws.onopen = () => {
-      setIsConnected(true);
-      console.log('Conectado ao WebSocket');
+      const ws = new WebSocket(PRODUCTION_CONFIG.WS_URL || 'wss://maverick-backend-kakm.onrender.com');
+      
+      ws.onopen = () => {
+        setIsConnected(true);
+        setReconnectAttempts(0);
+        console.log('Conexão WebSocket estabelecida');
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.type === 'PRODUCTS_UPDATED') {
+            setProducts(message.data);
+          }
+        } catch (error) {
+          console.error('Erro ao processar mensagem:', error);
+        }
+      };
+
+      ws.onclose = () => {
+        setIsConnected(false);
+        if (reconnectAttempts < PRODUCTION_CONFIG.MAX_RECONNECT_ATTEMPTS) {
+          console.log(`Tentando reconectar (${reconnectAttempts + 1}/${PRODUCTION_CONFIG.MAX_RECONNECT_ATTEMPTS})...`);
+          setTimeout(connectWebSocket, PRODUCTION_CONFIG.RECONNECT_DELAY);
+          setReconnectAttempts(prev => prev + 1);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('Erro na conexão WebSocket:', error);
+      };
+
+      setSocket(ws);
     };
 
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === 'PRODUCTS_UPDATED') {
-        setProducts(message.data);
+    connectWebSocket();
+
+    return () => {
+      if (socket) {
+        socket.close();
       }
     };
+  }, [reconnectAttempts]);
 
-    ws.onclose = () => {
-      setIsConnected(false);
-      console.log('Desconectado do WebSocket');
-    };
-
-    return () => ws.close();
-  }, []);
-
-  // Carrega produtos iniciais da API
+  // Carrega produtos com cache e retry
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/products`);
-      if (!response.ok) throw new Error('Erro ao carregar produtos');
+      const response = await fetch(`${PRODUCTION_CONFIG.API_URL}/api/products`, {
+        cache: 'no-cache'
+      });
+      
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
       const data = await response.json();
       setProducts(data);
     } catch (error) {
-      console.error('Erro:', error);
+      console.error('Falha ao carregar produtos:', error);
+      // Tentar novamente após 5 segundos
+      setTimeout(fetchProducts, 5000);
     }
   };
 
-  // Atualiza produtos no servidor
+  // Sincronização otimizada
   const syncProducts = async (updatedProducts: Product[]) => {
     try {
-      const response = await fetch(`${API_URL}/api/products`, {
+      const response = await fetch(`${PRODUCTION_CONFIG.API_URL}/api/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedProducts),
+        credentials: 'include'
       });
-      if (!response.ok) throw new Error('Erro ao sincronizar produtos');
+      
+      if (!response.ok) {
+        throw new Error(`Erro na sincronização: ${await response.text()}`);
+      }
     } catch (error) {
-      console.error('Erro:', error);
+      console.error('Falha na sincronização:', error);
+      throw error;
     }
   };
 
@@ -67,20 +112,17 @@ const useProductStore = () => {
       ...productData,
       id: Date.now().toString(),
     };
-    const updatedProducts = [...products, newProduct];
-    await syncProducts(updatedProducts);
+    await syncProducts([...products, newProduct]);
   };
 
   const updateProduct = async (updatedProduct: Product) => {
-    const updatedProducts = products.map(p => 
+    await syncProducts(products.map(p => 
       p.id === updatedProduct.id ? updatedProduct : p
-    );
-    await syncProducts(updatedProducts);
+    ));
   };
 
   const deleteProduct = async (productId: string) => {
-    const updatedProducts = products.filter(p => p.id !== productId);
-    await syncProducts(updatedProducts);
+    await syncProducts(products.filter(p => p.id !== productId));
   };
 
   // Carrega produtos ao iniciar
