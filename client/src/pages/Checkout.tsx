@@ -51,7 +51,7 @@ const PaymentMethods = styled.div`
 `;
 
 const PaymentMethodCard = styled.div<{ selected: boolean }>`
-  border: 1px solid ${props => props.selected ? '#ea1d2c' : '#ddd'};
+  border: 1px solid ${props => (props.selected ? '#ea1d2c' : '#ddd')};
   border-radius: 8px;
   padding: 12px;
   display: flex;
@@ -59,7 +59,7 @@ const PaymentMethodCard = styled.div<{ selected: boolean }>`
   align-items: center;
   cursor: pointer;
   transition: all 0.3s;
-  background-color: ${props => props.selected ? '#fff5f5' : 'white'};
+  background-color: ${props => (props.selected ? '#fff5f5' : 'white')};
 
   &:hover {
     border-color: #ea1d2c;
@@ -85,7 +85,7 @@ const CardBrands = styled.div`
 `;
 
 const CardBrand = styled.div<{ selected: boolean }>`
-  border: 1px solid ${props => props.selected ? '#ea1d2c' : '#ddd'};
+  border: 1px solid ${props => (props.selected ? '#ea1d2c' : '#ddd')};
   border-radius: 4px;
   padding: 8px;
   display: flex;
@@ -93,7 +93,7 @@ const CardBrand = styled.div<{ selected: boolean }>`
   align-items: center;
   cursor: pointer;
   transition: all 0.3s;
-  background-color: ${props => props.selected ? '#fff5f5' : 'white'};
+  background-color: ${props => (props.selected ? '#fff5f5' : 'white')};
 
   &:hover {
     border-color: #ea1d2c;
@@ -155,7 +155,10 @@ const Checkout: React.FC = () => {
       },
       payment: {
         method: selectedPaymentMethod as 'credit' | 'debit' | 'pix' | 'cash',
-        cardBrand: selectedPaymentMethod === 'credit' || selectedPaymentMethod === 'debit' ? selectedCardBrand : undefined,
+        cardBrand:
+          selectedPaymentMethod === 'credit' || selectedPaymentMethod === 'debit'
+            ? selectedCardBrand
+            : undefined,
         changeFor: selectedPaymentMethod === 'cash' ? parseFloat(values.changeFor) : undefined,
       },
       items: cart,
@@ -208,14 +211,14 @@ const Checkout: React.FC = () => {
     name: Yup.string().required('Nome é obrigatório'),
     address: Yup.string().required('Endereço é obrigatório'),
     phone: Yup.string().required('Telefone é obrigatório'),
-    changeFor: Yup.number()
-      .when('paymentMethod', {
-        is: 'cash',
-        then: (schema) =>
-          schema
-            .required('Informe o valor para troco')
-            .min(calculateTotal(), `O valor deve ser pelo menos R$ ${calculateTotal().toFixed(2)}`),
-      }),
+    changeFor: Yup.number().when('paymentMethod', {
+      is: 'cash',
+      then: (schema) =>
+        schema
+          .required('Informe o valor para troco')
+          .min(calculateTotal(), `O valor deve ser pelo menos R$ ${calculateTotal().toFixed(2)}`),
+      otherwise: (schema) => schema.notRequired(),
+    }),
   });
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -255,7 +258,12 @@ const Checkout: React.FC = () => {
 
                 <FormGroup>
                   <Label htmlFor="complement">Complemento</Label>
-                  <Input type="text" id="complement" name="complement" placeholder="Apto, bloco, referência..." />
+                  <Input
+                    type="text"
+                    id="complement"
+                    name="complement"
+                    placeholder="Apto, bloco, referência..."
+                  />
                 </FormGroup>
 
                 <FormGroup>
@@ -267,7 +275,7 @@ const Checkout: React.FC = () => {
                 <FormGroup>
                   <Label>Forma de pagamento</Label>
                   <PaymentMethods>
-                    {paymentMethods.map(method => (
+                    {paymentMethods.map((method) => (
                       <PaymentMethodCard
                         key={method.id}
                         selected={selectedPaymentMethod === method.id}
@@ -287,7 +295,7 @@ const Checkout: React.FC = () => {
                   <FormGroup>
                     <Label>Bandeira do cartão</Label>
                     <CardBrands>
-                      {cardBrands.map(brand => (
+                      {cardBrands.map((brand) => (
                         <CardBrand
                           key={brand.id}
                           selected={selectedCardBrand === brand.id}
@@ -305,12 +313,7 @@ const Checkout: React.FC = () => {
                     <Label>Troco para quanto?</Label>
                     <ChangeForInput>
                       <span>R$</span>
-                      <Input
-                        type="number"
-                        name="changeFor"
-                        min={calculateTotal()}
-                        step="0.01"
-                      />
+                      <Input type="number" name="changeFor" min={calculateTotal()} step="0.01" />
                     </ChangeForInput>
                     <ErrorMessage name="changeFor" component={ErrorText} />
                   </FormGroup>
@@ -321,7 +324,8 @@ const Checkout: React.FC = () => {
                   className="btn-primary"
                   disabled={
                     !selectedPaymentMethod ||
-                    ((selectedPaymentMethod === 'credit' || selectedPaymentMethod === 'debit') && !selectedCardBrand)
+                    ((selectedPaymentMethod === 'credit' || selectedPaymentMethod === 'debit') &&
+                      !selectedCardBrand)
                   }
                 >
                   Fazer Pedido
