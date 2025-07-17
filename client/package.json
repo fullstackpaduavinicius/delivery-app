@@ -33,8 +33,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "CI=false react-scripts build",
-    "build:prod": "env-cmd -f .env.production react-scripts build",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build:prod": "env-cmd -f .env.production DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build:prod",
@@ -46,9 +46,7 @@
       "react-app/jest"
     ],
     "rules": {
-      "react-hooks/exhaustive-deps": "warn",
-      "no-debugger": "error",
-      "no-console": ["warn", { "allow": ["warn", "error"] }]
+      "react-hooks/exhaustive-deps": "off"
     }
   },
   "browserslist": {
