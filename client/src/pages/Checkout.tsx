@@ -26,7 +26,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   display: block;
   margin-bottom: 8px;
-  font-weight: 500;
+  font-weight: 501;
 `;
 
 const Input = styled(Field)`
