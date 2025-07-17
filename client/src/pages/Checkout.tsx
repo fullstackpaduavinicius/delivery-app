@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
@@ -7,7 +6,6 @@ import { FaCreditCard, FaMoneyBillWave, FaQrcode } from 'react-icons/fa';
 import { RiBankCard2Line } from 'react-icons/ri';
 import Header from '../components/Header';
 import { useCart } from '../contexts/CartContext';
-import { CartItem, PaymentMethod } from '../types';
 
 const FormContainer = styled.div`
   background-color: white;
@@ -117,8 +115,13 @@ const ChangeForInput = styled.div`
   }
 `;
 
+type PaymentMethod = {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+};
+
 const Checkout: React.FC = () => {
-  const navigate = useNavigate();
   const { cart } = useCart();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [selectedCardBrand, setSelectedCardBrand] = useState<string | null>(null);
@@ -139,7 +142,7 @@ const Checkout: React.FC = () => {
   ];
 
   const calculateTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0) + 5; // + taxa de entrega
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0) + 5;
   };
 
   const handleSubmit = (values: any) => {
@@ -163,11 +166,10 @@ const Checkout: React.FC = () => {
   };
 
   const sendOrderToWhatsApp = (order: any) => {
-    const phoneNumber = '5579998807035'; // Substitua pelo número da sua cliente
+    const phoneNumber = '5579998807035';
     const message = formatOrderMessage(order);
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    
     window.open(whatsappUrl, '_blank');
   };
 
@@ -178,23 +180,22 @@ const Checkout: React.FC = () => {
     message += `*Complemento:* ${order.customer.complement}\n`;
     message += `*Telefone:* ${order.customer.phone}\n\n`;
     message += `*Itens:*\n`;
-    
+
     order.items.forEach((item: any) => {
       message += `- ${item.name} (${item.quantity}x) - R$ ${(item.price * item.quantity).toFixed(2)}\n`;
     });
-    
+
     message += `\n*Taxa de entrega:* R$ 5.00\n`;
     message += `*Total:* R$ ${order.total.toFixed(2)}\n\n`;
     message += `*Pagamento:* ${getPaymentMethodLabel(order.payment.method)}\n`;
-    
+
     if (order.payment.method === 'credit' || order.payment.method === 'debit') {
       message += `*Bandeira:* ${order.payment.cardBrand}\n`;
     } else if (order.payment.method === 'cash') {
       message += `*Troco para:* R$ ${order.payment.changeFor?.toFixed(2) || '0.00'}\n`;
     }
-    
+
     message += `\nObrigado pelo pedido! 🎉`;
-    
     return message;
   };
 
@@ -210,9 +211,10 @@ const Checkout: React.FC = () => {
     changeFor: Yup.number()
       .when('paymentMethod', {
         is: 'cash',
-        then: (schema) => schema
-          .required('Informe o valor para troco')
-          .min(calculateTotal(), `O valor deve ser pelo menos R$ ${calculateTotal().toFixed(2)}`),
+        then: (schema) =>
+          schema
+            .required('Informe o valor para troco')
+            .min(calculateTotal(), `O valor deve ser pelo menos R$ ${calculateTotal().toFixed(2)}`),
       }),
   });
 
@@ -224,7 +226,7 @@ const Checkout: React.FC = () => {
       <div className="container">
         <FormContainer>
           <FormTitle>Finalizar Pedido</FormTitle>
-          
+
           <Formik
             initialValues={{
               name: '',
@@ -237,7 +239,7 @@ const Checkout: React.FC = () => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ values, setFieldValue }) => (
+            {({ setFieldValue }) => (
               <Form>
                 <FormGroup>
                   <Label htmlFor="name">Nome</Label>
@@ -303,21 +305,24 @@ const Checkout: React.FC = () => {
                     <Label>Troco para quanto?</Label>
                     <ChangeForInput>
                       <span>R$</span>
-                      <Input 
-                        type="number" 
-                        name="changeFor" 
-                        min={calculateTotal()} 
-                        step="0.01" 
+                      <Input
+                        type="number"
+                        name="changeFor"
+                        min={calculateTotal()}
+                        step="0.01"
                       />
                     </ChangeForInput>
                     <ErrorMessage name="changeFor" component={ErrorText} />
                   </FormGroup>
                 )}
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="btn-primary"
-                  disabled={!selectedPaymentMethod || (selectedPaymentMethod !== 'pix' && selectedPaymentMethod !== 'cash' && !selectedCardBrand)}
+                  disabled={
+                    !selectedPaymentMethod ||
+                    ((selectedPaymentMethod === 'credit' || selectedPaymentMethod === 'debit') && !selectedCardBrand)
+                  }
                 >
                   Fazer Pedido
                 </button>
