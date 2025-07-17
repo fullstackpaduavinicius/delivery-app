@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ProductCard from '../components/ProductCard';
+import Header from '../components/Header';
+import AdminPanel from '../components/AdminPanel';
 import { useCart } from '../contexts/CartContext';
 import { Product } from '../types';
-import Header from '../components/Header';
 
+// Importações de imagens
 import classicoImage from '../imgs/classico.jpeg';
 import CheeseburgerImage from '../imgs/Cheeseburger.jpeg';
 import XsaladaImage from '../imgs/Xsalada.jpeg';
@@ -37,162 +39,220 @@ const CategoryTitle = styled.h2`
   color: #333;
 `;
 
+const AdminButton = styled.button`
+  margin: 20px;
+  padding: 10px 20px;
+  background-color: #ea1d2c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+
+  &:hover {
+    background-color: #d91826;
+  }
+`;
+
 const Home: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
   const { addToCart, cart } = useCart();
 
   useEffect(() => {
     const mockProducts: Product[] = [
+      // Lanches
       {
         id: '1',
         name: 'Hambúrguer Clássico',
         description: 'Pão, hambúrguer, queijo, alface e tomate',
-        price: 22.90,
+        price: 22.9,
         category: 'Lanches',
         image: classicoImage,
+        available: true
       },
       {
         id: '2',
         name: 'Cheeseburger',
         description: 'Pão, hambúrguer, queijo cheddar, bacon',
-        price: 25.90,
+        price: 25.9,
         category: 'Lanches',
         image: CheeseburgerImage,
+        available: true
       },
       {
         id: '3',
         name: 'X-Salada',
         description: 'Pão, hambúrguer, queijo, alface, tomate e maionese',
-        price: 20.90,
+        price: 20.9,
         category: 'Lanches',
         image: XsaladaImage,
+        available: true
       },
       {
         id: '4',
         name: 'X-Bacon',
         description: 'Pão, hambúrguer, queijo, bacon e maionese',
-        price: 27.90,
+        price: 27.9,
         category: 'Lanches',
         image: XbaconImage,
+        available: true
       },
       {
         id: '5',
         name: 'X-Tudo',
         description: 'Pão, 2 hambúrgueres, queijo, bacon, ovo, alface e tomate',
-        price: 32.90,
+        price: 32.9,
         category: 'Lanches',
         image: XtudoImage,
+        available: true
       },
       {
         id: '6',
         name: 'X-Frango',
         description: 'Pão, filé de frango, queijo, alface e tomate',
-        price: 24.90,
+        price: 24.9,
         category: 'Lanches',
         image: XfrangoImage,
+        available: true
       },
+      // Pizzas
       {
         id: '7',
         name: 'Pizza Margherita',
         description: 'Molho de tomate, mussarela e manjericão',
-        price: 45.90,
+        price: 45.9,
         category: 'Pizzas',
         image: Pizzamargherita,
+        available: true
       },
       {
         id: '8',
         name: 'Pizza Calabresa',
         description: 'Molho de tomate, mussarela e calabresa',
-        price: 48.90,
+        price: 48.9,
         category: 'Pizzas',
         image: Pizzacalabresa,
+        available: true
       },
       {
         id: '9',
         name: 'Pizza Portuguesa',
         description: 'Molho de tomate, mussarela, presunto, ovo, cebola e azeitona',
-        price: 52.90,
+        price: 52.9,
         category: 'Pizzas',
         image: Pizzaportuguesa,
+        available: true
       },
       {
         id: '10',
         name: 'Pizza Quatro Queijos',
         description: 'Molho de tomate, mussarela, provolone, parmesão e gorgonzola',
-        price: 55.90,
+        price: 55.9,
         category: 'Pizzas',
         image: Pizzaquatroqueijos,
+        available: true
       },
       {
         id: '11',
         name: 'Pizza Frango com Catupiry',
         description: 'Molho de tomate, frango desfiado e catupiry',
-        price: 50.90,
+        price: 50.9,
         category: 'Pizzas',
         image: Pizzafrangocomcatupiry,
+        available: true
       },
       {
         id: '12',
         name: 'Pizza Pepperoni',
         description: 'Molho de tomate, mussarela e pepperoni',
-        price: 49.90,
+        price: 49.9,
         category: 'Pizzas',
         image: Pizzapepperoni,
+        available: true
       },
+      // Bebidas
       {
         id: '13',
         name: 'Refrigerante',
         description: 'Lata 350ml',
-        price: 5.90,
+        price: 5.9,
         category: 'Bebidas',
         image: Refrigerante,
+        available: true
       },
       {
         id: '14',
         name: 'Suco Natural',
         description: 'Copo 300ml - sabores: laranja, abacaxi ou maracujá',
-        price: 7.90,
+        price: 7.9,
         category: 'Bebidas',
         image: Suconatural,
+        available: true
       },
       {
         id: '15',
         name: 'Água Mineral',
         description: 'Garrafa 500ml',
-        price: 3.90,
+        price: 3.9,
         category: 'Bebidas',
         image: Aguamineral,
+        available: true
       },
       {
         id: '16',
         name: 'Cerveja',
         description: 'Long neck 355ml',
-        price: 8.90,
+        price: 8.9,
         category: 'Bebidas',
         image: Cerveja,
+        available: true
       },
       {
         id: '17',
         name: 'Energético',
         description: 'Lata 250ml',
-        price: 10.90,
+        price: 10.9,
         category: 'Bebidas',
         image: Energetico,
+        available: true
       },
       {
         id: '18',
         name: 'Água de Coco',
         description: 'Garrafa 300ml',
-        price: 6.90,
+        price: 6.9,
         category: 'Bebidas',
         image: Aguadecoco,
+        available: true
       }
     ];
     setProducts(mockProducts);
   }, []);
 
   const handleAddToCart = (product: Product) => {
-    addToCart({ ...product, quantity: 1 });
+    if (product.available) {
+      addToCart({ ...product, quantity: 1 });
+    }
+  };
+
+  const handleAddProduct = (productData: Omit<Product, 'id'>) => {
+    const newProduct: Product = {
+      ...productData,
+      id: Date.now().toString(),
+    };
+    setProducts(prev => [...prev, newProduct]);
+  };
+
+  const handleUpdateProduct = (updatedProduct: Product) => {
+    setProducts(prev =>
+      prev.map(p => (p.id === updatedProduct.id ? updatedProduct : p))
+    );
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    setProducts(prev => prev.filter(product => product.id !== productId));
   };
 
   const categories = Array.from(new Set(products.map(product => product.category)));
@@ -202,22 +262,35 @@ const Home: React.FC = () => {
     <div>
       <Header cartItemCount={cartItemCount} />
       <div className="container">
-        {categories.map(category => (
-          <div key={category}>
-            <CategoryTitle>{category}</CategoryTitle>
-            <ProductsGrid>
-              {products
-                .filter(product => product.category === category)
-                .map(product => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
-                    onAddToCart={handleAddToCart} 
-                  />
-                ))}
-            </ProductsGrid>
-          </div>
-        ))}
+        <AdminButton onClick={() => setShowAdminPanel(!showAdminPanel)}>
+          {showAdminPanel ? 'Fechar Painel' : 'Abrir Painel do Restaurante'}
+        </AdminButton>
+
+        {showAdminPanel ? (
+          <AdminPanel 
+            products={products} 
+            onAddProduct={handleAddProduct}
+            onUpdateProduct={handleUpdateProduct}
+            onDeleteProduct={handleDeleteProduct}
+          />
+        ) : (
+          categories.map(category => (
+            <div key={category}>
+              <CategoryTitle>{category}</CategoryTitle>
+              <ProductsGrid>
+                {products
+                  .filter(product => product.category === category)
+                  .map(product => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onAddToCart={handleAddToCart}
+                    />
+                  ))}
+              </ProductsGrid>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

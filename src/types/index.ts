@@ -5,6 +5,8 @@ export interface Product {
   price: number;
   category: string;
   image: string;
+  available: boolean; // Novo campo para controle de estoque
+
 }
 
 export interface CartItem extends Product {

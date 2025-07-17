@@ -48,19 +48,25 @@ const ProductPrice = styled.span`
   color: #ea1d2c;
 `;
 
-const AddButton = styled.button`
-  background-color: #ea1d2c;
+const AddButton = styled.button<{ disabled?: boolean }>`
+  background-color: ${({ disabled }) => (disabled ? '#ccc' : '#ea1d2c')};
   color: white;
   border: none;
   border-radius: 4px;
   padding: 8px 16px;
   font-size: 14px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: all 0.3s;
 
   &:hover {
-    background-color: #d91826;
+    background-color: ${({ disabled }) => (disabled ? '#ccc' : '#d91826')};
   }
+`;
+
+const OutOfStock = styled.div`
+  font-size: 12px;
+  color: red;
+  margin-top: 8px;
 `;
 
 interface ProductCardProps {
@@ -77,8 +83,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
         <ProductDescription>{product.description}</ProductDescription>
         <ProductFooter>
           <ProductPrice>R$ {product.price.toFixed(2)}</ProductPrice>
-          <AddButton onClick={() => onAddToCart(product)}>Adicionar</AddButton>
+          <AddButton
+            onClick={() => onAddToCart(product)}
+            disabled={!product.available}
+          >
+            {product.available ? 'Adicionar' : 'Esgotado'}
+          </AddButton>
         </ProductFooter>
+        {!product.available && <OutOfStock>Indisponível</OutOfStock>}
       </ProductInfo>
     </Card>
   );
