@@ -140,14 +140,33 @@ const Cart: React.FC = () => {
 
   // Dados dos bairros e seus respectivos fretes
   const neighborhoods = [
-    { name: 'Selecione seu bairro', deliveryFee: 0 },
-    { name: 'Centro', deliveryFee: 5.00 },
-    { name: 'Jardim das Flores', deliveryFee: 8.00 },
-    { name: 'Vila Nova', deliveryFee: 7.50 },
-    { name: 'Bela Vista', deliveryFee: 6.00 },
-    { name: 'Alto da Colina', deliveryFee: 10.00 },
-    { name: 'Zona Industrial', deliveryFee: 12.00 },
-  ];
+  { name: 'Selecione seu bairro', deliveryFee: 0 },
+  { name: 'Novo Paraíso', deliveryFee: 3.00 },
+  { name: 'Bairro América', deliveryFee: 3.00 },
+  { name: 'José Conrado de Araújo', deliveryFee: 3.00 },
+  { name: 'Jardim Centenário', deliveryFee: 4.00 },
+  { name: 'Santos Dumont', deliveryFee: 4.00 },
+  { name: '18 do Forte', deliveryFee: 5.00 },
+  { name: 'Siqueira Campos', deliveryFee: 3.00 },
+  { name: 'Getúlio Vargas', deliveryFee: 4.00 },
+  { name: 'Santo Antônio', deliveryFee: 6.00 },
+  { name: 'Suíça', deliveryFee: 6.00 },
+  { name: 'Palestina', deliveryFee: 6.00 },
+  { name: 'Industrial', deliveryFee: 6.00 },
+  { name: 'Cirurgia', deliveryFee: 4.00 },
+  { name: 'São José', deliveryFee: 6.00 },
+  { name: 'Jabotiana', deliveryFee: 7.00 },
+  { name: 'Ponto Novo', deliveryFee: 5.00 },
+  { name: 'Luzia', deliveryFee: 5.00 },
+  { name: 'Jardins', deliveryFee: 7.00 },
+  { name: 'Treze de Julho', deliveryFee: 7.00 },
+  { name: 'Cidade Nova', deliveryFee: 6.00 },
+  { name: 'Capucho', deliveryFee: 5.00 },
+  { name: 'Olaria', deliveryFee: 4.00 },
+  { name: 'Rosa Elze', deliveryFee: 4.00 },
+  { name: 'Castelo Branco', deliveryFee: 4.00 },
+];
+
 
   const handleIncreaseQuantity = (productId: string) => {
     const updatedCart = cart.map(item =>

@@ -6,24 +6,13 @@ import { useCart } from '../contexts/CartContext';
 import { Product } from '../types';
 
 // Importações de imagens
-import classicoImage from '../imgs/classico.jpeg';
-import CheeseburgerImage from '../imgs/Cheeseburger.jpeg';
-import XsaladaImage from '../imgs/Xsalada.jpeg';
-import XbaconImage from '../imgs/Xbacon.jpeg';
-import XtudoImage from '../imgs/Xtudo.jpeg';
-import XfrangoImage from '../imgs/Xfrango.jpeg';
-import Pizzamargherita from '../imgs/Pizzamargherita.jpeg';
-import Pizzacalabresa from '../imgs/Pizzacalabresa.jpeg';
-import Pizzaportuguesa from '../imgs/Pizzaportuguesa.jpeg';
-import Pizzaquatroqueijos from '../imgs/Pizzaquatroqueijos.jpeg';
-import Pizzafrangocomcatupiry from '../imgs/Pizzafrangocomcatupiry.jpeg';
-import Pizzapepperoni from '../imgs/Pizzapepperoni.jpeg';
-import Refrigerante from '../imgs/Refrigerante.jpeg';
-import Suconatural from '../imgs/Suconatural.jpeg';
-import Aguamineral from '../imgs/Aguamineral.jpeg';
-import Cerveja from '../imgs/Cerveja.jpeg';
-import Energetico from '../imgs/Energetico.jpeg';
-import Aguadecoco from '../imgs/Aguadecoco.jpeg';
+import MaverickImage from '../imgs/Maverick.jpeg';
+import ComboRasanteImage from '../imgs/Combo_Rasante.jpeg';
+import TriploSargentoImage from '../imgs/Triplo_Sargento.jpeg';
+import XRecrutaImage from '../imgs/x-Recruta.jpeg';
+import MajorImage from '../imgs/Major.jpeg';
+import MaveCalabresaImage from '../imgs/Mave_Calabresa.jpeg';
+import MaveFrangoImage from '../imgs/Mave_Frango.jpeg';
 
 const ProductsGrid = styled.div`
   display: grid;
@@ -47,166 +36,113 @@ const Home: React.FC = () => {
       // Lanches
       {
         id: '1',
-        name: 'Hambúrguer Clássico',
-        description: 'Pão, hambúrguer, queijo, alface e tomate',
-        price: 22.9,
+        name: 'Maverick',
+        description: 'Pão brioche, 2 carnes com 100 g, 2 camadas de queijo cheddar, bacon, ovo, alface e tomate',
+        price: 33.0,
         category: 'Lanches',
-        image: classicoImage,
+        image: MaverickImage,
         available: true
       },
       {
         id: '2',
-        name: 'Cheeseburger',
-        description: 'Pão, hambúrguer, queijo cheddar, bacon',
-        price: 25.9,
+        name: 'X-Recruta',
+        description: 'Pão brioche, 1 carne com 100 g, queijo cheddar, frango',
+        price: 23.0,
         category: 'Lanches',
-        image: CheeseburgerImage,
+        image: XRecrutaImage,
         available: true
       },
       {
         id: '3',
-        name: 'X-Salada',
-        description: 'Pão, hambúrguer, queijo, alface, tomate e maionese',
-        price: 20.9,
+        name: 'Mave Calabresa',
+        description: 'Pão brioche, 1 carne com 100 g, 2 camadas de queijo cheddar, calabresa, ovo, alface e tomate',
+        price: 27.0,
         category: 'Lanches',
-        image: XsaladaImage,
+        image: MaveCalabresaImage,
         available: true
       },
       {
         id: '4',
-        name: 'X-Bacon',
-        description: 'Pão, hambúrguer, queijo, bacon e maionese',
-        price: 27.9,
+        name: 'Mave Frango',
+        description: 'Pão brioche, 1 carne com 100 g, queijo cheddar, frango, alface e tomate',
+        price: 25.0,
         category: 'Lanches',
-        image: XbaconImage,
+        image: MaveFrangoImage,
         available: true
       },
+      // Combos
       {
         id: '5',
-        name: 'X-Tudo',
-        description: 'Pão, 2 hambúrgueres, queijo, bacon, ovo, alface e tomate',
-        price: 32.9,
-        category: 'Lanches',
-        image: XtudoImage,
+        name: 'Combo Rasante',
+        description: '3 deliciosos hambúrgueres gourmet com carne de 100g, frango, bacon, queijo cheddar, batata Mav M e uma Guaraná Antarctica de 1L',
+        price: 70.0,
+        category: 'Combos',
+        image: ComboRasanteImage,
         available: true
       },
       {
         id: '6',
-        name: 'X-Frango',
-        description: 'Pão, filé de frango, queijo, alface e tomate',
-        price: 24.9,
-        category: 'Lanches',
-        image: XfrangoImage,
+        name: 'Triplo Sargento',
+        description: '3 deliciosos hamburgueres com pão brioche, carne artesanal com 100g, frango, bacon e queijo cheddar',
+        price: 49.0,
+        category: 'Combos',
+        image: TriploSargentoImage,
         available: true
       },
-      // Pizzas
       {
         id: '7',
-        name: 'Pizza Margherita',
-        description: 'Molho de tomate, mussarela e manjericão',
-        price: 45.9,
-        category: 'Pizzas',
-        image: Pizzamargherita,
+        name: 'Major',
+        description: 'Pão brioche, 2 carnes com 150g, 1 frango empanado, bacon, queijo cheddar e batata frita com cheddar',
+        price: 40.0,
+        category: 'Combos',
+        image: MajorImage,
         available: true
       },
+      // Batatas
       {
         id: '8',
-        name: 'Pizza Calabresa',
-        description: 'Molho de tomate, mussarela e calabresa',
-        price: 48.9,
-        category: 'Pizzas',
-        image: Pizzacalabresa,
+        name: 'Batata Mav M',
+        description: 'Porção média de batata frita crocante',
+        price: 12.0,
+        category: 'Batatas',
+        image: '', // Adicione a imagem correspondente
         available: true
       },
       {
         id: '9',
-        name: 'Pizza Portuguesa',
-        description: 'Molho de tomate, mussarela, presunto, ovo, cebola e azeitona',
-        price: 52.9,
-        category: 'Pizzas',
-        image: Pizzaportuguesa,
-        available: true
-      },
-      {
-        id: '10',
-        name: 'Pizza Quatro Queijos',
-        description: 'Molho de tomate, mussarela, provolone, parmesão e gorgonzola',
-        price: 55.9,
-        category: 'Pizzas',
-        image: Pizzaquatroqueijos,
-        available: true
-      },
-      {
-        id: '11',
-        name: 'Pizza Frango com Catupiry',
-        description: 'Molho de tomate, frango desfiado e catupiry',
-        price: 50.9,
-        category: 'Pizzas',
-        image: Pizzafrangocomcatupiry,
-        available: true
-      },
-      {
-        id: '12',
-        name: 'Pizza Pepperoni',
-        description: 'Molho de tomate, mussarela e pepperoni',
-        price: 49.9,
-        category: 'Pizzas',
-        image: Pizzapepperoni,
+        name: 'Batata com Cheddar',
+        description: 'Porção de batata frita com cheddar derretido',
+        price: 15.0,
+        category: 'Batatas',
+        image: '', // Adicione a imagem correspondente
         available: true
       },
       // Bebidas
       {
-        id: '13',
-        name: 'Refrigerante',
-        description: 'Lata 350ml',
-        price: 5.9,
+        id: '10',
+        name: 'Guaraná Antarctica 1L',
+        description: 'Refrigerante Guaraná Antarctica 1 litro',
+        price: 8.0,
         category: 'Bebidas',
-        image: Refrigerante,
+        image: '', // Adicione a imagem correspondente
         available: true
       },
       {
-        id: '14',
-        name: 'Suco Natural',
-        description: 'Copo 300ml - sabores: laranja, abacaxi ou maracujá',
-        price: 7.9,
+        id: '11',
+        name: 'Coca-Cola 600ml',
+        description: 'Refrigerante Coca-Cola 600ml',
+        price: 7.0,
         category: 'Bebidas',
-        image: Suconatural,
+        image: '', // Adicione a imagem correspondente
         available: true
       },
       {
-        id: '15',
-        name: 'Água Mineral',
-        description: 'Garrafa 500ml',
-        price: 3.9,
+        id: '12',
+        name: 'Suco Natural 300ml',
+        description: 'Suco natural de laranja, abacaxi ou maracujá',
+        price: 6.0,
         category: 'Bebidas',
-        image: Aguamineral,
-        available: true
-      },
-      {
-        id: '16',
-        name: 'Cerveja',
-        description: 'Long neck 355ml',
-        price: 8.9,
-        category: 'Bebidas',
-        image: Cerveja,
-        available: true
-      },
-      {
-        id: '17',
-        name: 'Energético',
-        description: 'Lata 250ml',
-        price: 10.9,
-        category: 'Bebidas',
-        image: Energetico,
-        available: true
-      },
-      {
-        id: '18',
-        name: 'Água de Coco',
-        description: 'Garrafa 300ml',
-        price: 6.9,
-        category: 'Bebidas',
-        image: Aguadecoco,
+        image: '', // Adicione a imagem correspondente
         available: true
       }
     ];

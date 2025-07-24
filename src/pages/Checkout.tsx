@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
-import { FaCreditCard, FaMoneyBillWave, FaQrcode } from 'react-icons/fa';
+import { FaCreditCard, FaMoneyBillWave, FaQrcode, FaCopy } from 'react-icons/fa';
 import { RiBankCard2Line } from 'react-icons/ri';
 import Header from '../components/Header';
 import { useCart } from '../contexts/CartContext';
@@ -79,20 +79,17 @@ const PaymentLabel = styled.span`
   text-align: center;
 `;
 
-const CardBrands = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+const CardBrandsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   margin: 16px 0;
 `;
 
-const CardBrand = styled.div<{ selected: boolean }>`
+const CardBrandOption = styled.div<{ selected: boolean }>`
   border: 1px solid ${props => (props.selected ? '#ea1d2c' : '#ddd')};
   border-radius: 4px;
-  padding: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  padding: 12px;
   cursor: pointer;
   transition: all 0.3s;
   background-color: ${props => (props.selected ? '#fff5f5' : 'white')};
@@ -100,10 +97,42 @@ const CardBrand = styled.div<{ selected: boolean }>`
   &:hover {
     border-color: #ea1d2c;
   }
+`;
 
-  img {
-    max-width: 100%;
-    height: auto;
+const PixContainer = styled.div`
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const PixCode = styled.div`
+  font-family: monospace;
+  font-size: 16px;
+  margin: 12px 0;
+  padding: 8px 12px;
+  background-color: white;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+`;
+
+const CopyButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ea1d2c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #c41722;
   }
 `;
 
@@ -124,13 +153,13 @@ type PaymentMethod = {
 };
 
 const Checkout: React.FC = () => {
-  const navigate = useNavigate(); // <-- agora usado
+  const navigate = useNavigate();
   const { cart } = useCart();
-  // Se quiser garantir tipagem, converta:
-  const typedCart = cart as CartItem[]; // uso de CartItem evita warning
+  const typedCart = cart as CartItem[];
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [selectedCardBrand, setSelectedCardBrand] = useState<string | null>(null);
+  const [copiedPix, setCopiedPix] = useState(false);
 
   const paymentMethods: PaymentMethod[] = [
     { id: 'credit', label: 'Crédito', icon: <FaCreditCard /> },
@@ -140,20 +169,31 @@ const Checkout: React.FC = () => {
   ];
 
   const cardBrands = [
-    { id: 'visa', name: 'Visa', image: 'https://via.placeholder.com/40x25?text=VISA' },
-    { id: 'mastercard', name: 'Mastercard', image: 'https://via.placeholder.com/40x25?text=MC' },
-    { id: 'elo', name: 'Elo', image: 'https://via.placeholder.com/40x25?text=ELO' },
-    { id: 'amex', name: 'Amex', image: 'https://via.placeholder.com/40x25?text=AMEX' },
-    { id: 'hipercard', name: 'Hipercard', image: 'https://via.placeholder.com/40x25?text=HC' },
+    { id: 'visa', name: 'Visa' },
+    { id: 'mastercard', name: 'Mastercard' },
+    { id: 'elo', name: 'Elo' },
+    { id: 'amex', name: 'American Express' },
+    { id: 'hipercard', name: 'Hipercard' },
   ];
 
-  const DELIVERY_FEE = 5; // se quiser tornar configurável, trocar por ENV ou prop
+  const DELIVERY_FEE = 5;
+  const PIX_KEY = '60.654.740/0001-73';
 
   const calculateTotal = () => {
     return typedCart.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0) + DELIVERY_FEE;
   };
 
+  const copyPixToClipboard = () => {
+    navigator.clipboard.writeText(PIX_KEY);
+    setCopiedPix(true);
+    setTimeout(() => setCopiedPix(false), 2000);
+  };
+
   const handleSubmit = (values: any) => {
+    const total = calculateTotal();
+    const changeFor = selectedPaymentMethod === 'cash' ? parseFloat(values.changeFor) : 0;
+    const changeAmount = changeFor - total;
+
     const order = {
       customer: {
         name: values.name,
@@ -167,16 +207,14 @@ const Checkout: React.FC = () => {
           selectedPaymentMethod === 'credit' || selectedPaymentMethod === 'debit'
             ? selectedCardBrand
             : undefined,
-        changeFor: selectedPaymentMethod === 'cash' ? parseFloat(values.changeFor) : undefined,
+        changeFor: selectedPaymentMethod === 'cash' ? changeFor : undefined,
+        changeAmount: selectedPaymentMethod === 'cash' ? changeAmount : undefined,
       },
       items: typedCart,
-      total: calculateTotal(),
+      total: total,
     };
 
     sendOrderToWhatsApp(order);
-
-    // ✅ Use o navigate para evitar warning de variável não usada
-    // Ajuste a rota conforme sua aplicação ("/" ou "/pedido" etc.)
     navigate('/');
   };
 
@@ -207,7 +245,11 @@ const Checkout: React.FC = () => {
     if (order.payment.method === 'credit' || order.payment.method === 'debit') {
       message += `*Bandeira:* ${order.payment.cardBrand}\n`;
     } else if (order.payment.method === 'cash') {
-      message += `*Troco para:* R$ ${order.payment.changeFor?.toFixed(2) || '0.00'}\n`;
+      message += `*Valor recebido:* R$ ${order.payment.changeFor?.toFixed(2) || '0.00'}\n`;
+      message += `*Troco:* R$ ${order.payment.changeAmount?.toFixed(2) || '0.00'}\n`;
+    } else if (order.payment.method === 'pix') {
+      message += `\n*Chave PIX:* ${PIX_KEY}\n`;
+      message += `Por favor, envie o comprovante de pagamento para confirmarmos seu pedido.\n`;
     }
 
     message += `\nObrigado pelo pedido! 🎉`;
@@ -306,29 +348,48 @@ const Checkout: React.FC = () => {
                 {(selectedPaymentMethod === 'credit' || selectedPaymentMethod === 'debit') && (
                   <FormGroup>
                     <Label>Bandeira do cartão</Label>
-                    <CardBrands>
+                    <CardBrandsContainer>
                       {cardBrands.map((brand) => (
-                        <CardBrand
+                        <CardBrandOption
                           key={brand.id}
                           selected={selectedCardBrand === brand.id}
                           onClick={() => setSelectedCardBrand(brand.id)}
                         >
-                          <img src={brand.image} alt={brand.name} />
-                        </CardBrand>
+                          {brand.name}
+                        </CardBrandOption>
                       ))}
-                    </CardBrands>
+                    </CardBrandsContainer>
                   </FormGroup>
                 )}
 
+                {selectedPaymentMethod === 'pix' && (
+                  <PixContainer>
+                    <p>Chave PIX Copia e Cola:</p>
+                    <PixCode>{PIX_KEY}</PixCode>
+                    <CopyButton onClick={copyPixToClipboard}>
+                      <FaCopy />
+                      {copiedPix ? 'Copiado!' : 'Copiar PIX'}
+                    </CopyButton>
+                    <p style={{ marginTop: '8px', fontSize: '14px' }}>
+                      Envie o comprovante para confirmarmos seu pedido.
+                    </p>
+                  </PixContainer>
+                )}
+
                 {selectedPaymentMethod === 'cash' && (
-                  <FormGroup>
-                    <Label>Troco para quanto?</Label>
-                    <ChangeForInput>
-                      <span>R$</span>
-                      <Input type="number" name="changeFor" min={calculateTotal()} step="0.01" />
-                    </ChangeForInput>
-                    <ErrorMessage name="changeFor" component={ErrorText} />
-                  </FormGroup>
+                  <>
+                    <FormGroup>
+                      <Label>Troco para quanto?</Label>
+                      <ChangeForInput>
+                        <span>R$</span>
+                        <Input type="number" name="changeFor" min={calculateTotal()} step="0.01" />
+                      </ChangeForInput>
+                      <ErrorMessage name="changeFor" component={ErrorText} />
+                    </FormGroup>
+                    <p style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
+                      Valor total: R$ {calculateTotal().toFixed(2)}
+                    </p>
+                  </>
                 )}
 
                 <button
