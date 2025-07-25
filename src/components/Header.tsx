@@ -106,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ showBackButton = false, cartItemCount =
               <FiArrowLeft size={24} />
             </BackButton>
           ) : (
-            <AppTitle>Cardápio Maverick</AppTitle>
+            <AppTitle>Cardápio<br/>Maverick</AppTitle>
           )}
         </LeftContainer>
 
