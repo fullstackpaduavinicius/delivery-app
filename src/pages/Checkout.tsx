@@ -219,7 +219,7 @@ const Checkout: React.FC = () => {
   };
 
   const sendOrderToWhatsApp = (order: any) => {
-    const phoneNumber = '5579998807035';
+    const phoneNumber = '557996718008';
     const message = formatOrderMessage(order);
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;

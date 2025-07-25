@@ -13,6 +13,12 @@ import XRecrutaImage from '../imgs/x-Recruta.jpeg';
 import MajorImage from '../imgs/Major.jpeg';
 import MaveCalabresaImage from '../imgs/Mave_Calabresa.jpeg';
 import MaveFrangoImage from '../imgs/Mave_Frango.jpeg';
+import cocalata from '../imgs/coca-lata.jpeg';
+import cocalitro from '../imgs/coca-litro.jpeg';
+import guaranalata from '../imgs/guarana-lata.jpeg';
+import guaranalitro from '../imgs/guarana-litro.jpeg';
+import CapitaoDoMarImage from '../imgs/CAPITAO_DO_MAR.jpeg';
+import batatas from '../imgs/batatas.jpeg';
 
 const ProductsGrid = styled.div`
   display: grid;
@@ -33,16 +39,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     const mockProducts: Product[] = [
-      // Lanches
-      {
-        id: '1',
-        name: 'Maverick',
-        description: 'Pão brioche, 2 carnes com 100 g, 2 camadas de queijo cheddar, bacon, ovo, alface e tomate',
-        price: 33.0,
-        category: 'Lanches',
-        image: MaverickImage,
-        available: true
-      },
+      // Lanches (ordered by price ascending)
       {
         id: '2',
         name: 'X-Recruta',
@@ -50,6 +47,15 @@ const Home: React.FC = () => {
         price: 23.0,
         category: 'Lanches',
         image: XRecrutaImage,
+        available: true
+      },
+      {
+        id: '4',
+        name: 'Mave Frango',
+        description: 'Pão brioche, 1 carne com 100 g, queijo cheddar, frango, alface e tomate',
+        price: 25.0,
+        category: 'Lanches',
+        image: MaveFrangoImage,
         available: true
       },
       {
@@ -62,24 +68,16 @@ const Home: React.FC = () => {
         available: true
       },
       {
-        id: '4',
-        name: 'Mave Frango',
-        description: 'Pão brioche, 1 carne com 100 g, queijo cheddar, frango, alface e tomate',
-        price: 25.0,
+        id: '1',
+        name: 'Maverick',
+        description: 'Pão brioche, 2 carnes com 100 g, 2 camadas de queijo cheddar, bacon, ovo, alface e tomate',
+        price: 33.0,
         category: 'Lanches',
-        image: MaveFrangoImage,
+        image: MaverickImage,
         available: true
       },
-      // Combos
-      {
-        id: '5',
-        name: 'Combo Rasante',
-        description: '3 deliciosos hambúrgueres gourmet com carne de 100g, frango, bacon, queijo cheddar, batata Mav M e uma Guaraná Antarctica de 1L',
-        price: 70.0,
-        category: 'Combos',
-        image: ComboRasanteImage,
-        available: true
-      },
+      
+      // Combos (ordered by price ascending)
       {
         id: '6',
         name: 'Triplo Sargento',
@@ -98,51 +96,91 @@ const Home: React.FC = () => {
         image: MajorImage,
         available: true
       },
-      // Batatas
+      {
+        id: '13',
+        name: 'Capitão do Mar',
+        description: 'Combo especial com peixe empanado, batata frita e refrigerante',
+        price: 55.0,
+        category: 'Combos',
+        image: CapitaoDoMarImage,
+        available: true
+      },
+      {
+        id: '5',
+        name: 'Combo Rasante',
+        description: '3 deliciosos hambúrgueres gourmet com carne de 100g, frango, bacon, queijo cheddar, batata M e uma Guaraná Antarctica de 1L',
+        price: 70.0,
+        category: 'Combos',
+        image: ComboRasanteImage,
+        available: true
+      },
+      
+      // Batatas (ordered by price ascending)
       {
         id: '8',
-        name: 'Batata Mav M',
-        description: 'Porção média de batata frita crocante',
-        price: 12.0,
+        name: 'Batata P (250g)',
+        description: 'Porção pequena de batata frita crocante',
+        price: 15.0,
         category: 'Batatas',
-        image: '', // Adicione a imagem correspondente
+        image: batatas,
         available: true
       },
       {
         id: '9',
-        name: 'Batata com Cheddar',
-        description: 'Porção de batata frita com cheddar derretido',
-        price: 15.0,
+        name: 'Batata M (350g)',
+        description: 'Porção média de batata frita crocante',
+        price: 20.0,
         category: 'Batatas',
-        image: '', // Adicione a imagem correspondente
+        image: batatas,
         available: true
       },
-      // Bebidas
       {
         id: '10',
+        name: 'Batata G (500g)',
+        description: 'Porção grande de batata frita crocante',
+        price: 30.0,
+        category: 'Batatas',
+        image: batatas,
+        available: true
+      },
+      
+      
+      // Bebidas (ordered by price ascending)
+      
+      {
+        id: '15',
+        name: 'Coca-Cola Lata',
+        description: 'Refrigerante Coca-Cola em lata 350ml',
+        price: 5.0,
+        category: 'Bebidas',
+        image: cocalata,
+        available: true
+      },
+      {
+        id: '16',
+        name: 'Guaraná Antarctica Lata',
+        description: 'Refrigerante Guaraná Antarctica em lata 350ml',
+        price: 5.0,
+        category: 'Bebidas',
+        image: guaranalata,
+        available: true
+      },
+      {
+        id: '17',
+        name: 'Coca-Cola 1L',
+        description: 'Refrigerante Coca-Cola 1L',
+        price: 7.0,
+        category: 'Bebidas',
+        image: cocalitro,
+        available: true
+      },
+      {
+        id: '18',
         name: 'Guaraná Antarctica 1L',
         description: 'Refrigerante Guaraná Antarctica 1 litro',
         price: 8.0,
         category: 'Bebidas',
-        image: '', // Adicione a imagem correspondente
-        available: true
-      },
-      {
-        id: '11',
-        name: 'Coca-Cola 600ml',
-        description: 'Refrigerante Coca-Cola 600ml',
-        price: 7.0,
-        category: 'Bebidas',
-        image: '', // Adicione a imagem correspondente
-        available: true
-      },
-      {
-        id: '12',
-        name: 'Suco Natural 300ml',
-        description: 'Suco natural de laranja, abacaxi ou maracujá',
-        price: 6.0,
-        category: 'Bebidas',
-        image: '', // Adicione a imagem correspondente
+        image: guaranalitro,
         available: true
       }
     ];
@@ -168,6 +206,7 @@ const Home: React.FC = () => {
             <ProductsGrid>
               {products
                 .filter(product => product.category === category)
+                .sort((a, b) => a.price - b.price)
                 .map(product => (
                   <ProductCard
                     key={product.id}
