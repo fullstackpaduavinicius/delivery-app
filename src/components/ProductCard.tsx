@@ -8,6 +8,7 @@ const Card = styled.div`
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-5px);
@@ -16,8 +17,9 @@ const Card = styled.div`
 
 const ProductImage = styled.img`
   width: 100%;
-  height: 160px;
+  height: 180px;
   object-fit: cover;
+  cursor: zoom-in;
 `;
 
 const ProductInfo = styled.div`
@@ -34,6 +36,10 @@ const ProductDescription = styled.p`
   font-size: 14px;
   color: #666;
   margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `;
 
 const ProductFooter = styled.div`
@@ -72,19 +78,28 @@ const OutOfStock = styled.div`
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
+  onClick: () => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onClick }) => {
+  const handleAddClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToCart(product);
+  };
+
   return (
-    <Card>
-      <ProductImage src={product.image} alt={product.name} />
+    <Card onClick={onClick}>
+      <ProductImage src={product.image} alt={product.name} onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }} />
       <ProductInfo>
         <ProductName>{product.name}</ProductName>
         <ProductDescription>{product.description}</ProductDescription>
         <ProductFooter>
           <ProductPrice>R$ {product.price.toFixed(2)}</ProductPrice>
           <AddButton
-            onClick={() => onAddToCart(product)}
+            onClick={handleAddClick}
             disabled={!product.available}
           >
             {product.available ? 'Adicionar' : 'Esgotado'}
