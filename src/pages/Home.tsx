@@ -314,7 +314,7 @@ const Home: React.FC = () => {
         id: '17',
         name: 'Coca-Cola 1L',
         description: 'Refrigerante Coca-Cola 1L',
-        price: 7.0,
+        price: 8.0,
         category: 'Bebidas',
         image: cocalitro,
         available: true
