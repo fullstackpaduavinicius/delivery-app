@@ -247,7 +247,7 @@ const Home: React.FC = () => {
         id: '13',
         name: 'Capitão do Mar',
         description: 'Pão brioche, 1 carne de 100g, cream cheese, camarão e uma coca-cola em lata.',
-        price: 55.0,
+        price: 37.0,
         category: 'Combos',
         image: CapitaoDoMarImage,
         available: true
