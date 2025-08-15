@@ -1,3 +1,4 @@
+// src/pages/Home.tsx
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ProductCard from '../components/ProductCard';
@@ -5,7 +6,9 @@ import Header from '../components/Header';
 import { useCart } from '../contexts/CartContext';
 import { Product } from '../types';
 
-// Importações de imagens
+// Imagens (atenção ao case exato dos nomes de arquivo)
+import MaveSmashDuoImage from '../imgs/MAVESmashDuo.jpeg';
+import MaveLoopImage from '../imgs/MAVELOOP.jpeg';
 import MaverickImage from '../imgs/Maverick.jpeg';
 import ComboRasanteImage from '../imgs/Combo_Rasante.jpeg';
 import TriploSargentoImage from '../imgs/Triplo_Sargento.jpeg';
@@ -47,13 +50,10 @@ const CategoryTitle = styled.h2`
   font-weight: 600;
 `;
 
-// Modal para imagem em tela cheia
+// Modal: imagem em tela cheia
 const FullscreenImageModal = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.95);
   display: flex;
   justify-content: center;
@@ -69,13 +69,10 @@ const FullscreenImage = styled.img`
   cursor: default;
 `;
 
-// Modal para detalhes do produto
+// Modal: detalhes do produto
 const ProductModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
@@ -92,6 +89,7 @@ const ProductModalContent = styled.div`
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 
 const ModalImageContainer = styled.div`
@@ -171,7 +169,6 @@ const CloseButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10;
 
   &:hover {
     background: rgba(217, 24, 38, 0.9);
@@ -188,152 +185,179 @@ const Home: React.FC = () => {
     const mockProducts: Product[] = [
       // Lanches
       {
-        id: '2',
+        id: 'lanche-mave-smash-duo',
+        name: 'Mave Smash Duo',
+        description:
+          'Pão brioche, 2 carnes smash fininhas e crocantes nas bordas, queijo muçarela derretido, alface e tomate.',
+        price: 12.0,
+        category: 'Lanches',
+        image: MaveSmashDuoImage,
+        available: true,
+      },
+      {
+        id: 'lanche-mave-loop',
+        name: 'Mave Loop',
+        description:
+          'Pão brioche, carne artesanal suculenta, queijo cheddar cremoso, coroado com três anéis de cebola crocantes.',
+        price: 16.0,
+        category: 'Lanches',
+        image: MaveLoopImage,
+        available: true,
+      },
+      {
+        id: 'lanche-x-recruta',
         name: 'X-Recruta',
-        description: 'Pão brioche, 1 carne com 100 g, queijo cheddar, frango',
+        description: 'Pão brioche, 1 carne 100g, queijo cheddar e frango.',
         price: 23.0,
         category: 'Lanches',
         image: XRecrutaImage,
-        available: true
+        available: true,
       },
       {
-        id: '4',
+        id: 'lanche-mave-frango',
         name: 'Mave Frango',
-        description: 'Pão brioche, 1 carne com 100 g, queijo cheddar, frango, alface e tomate',
+        description: 'Pão brioche, 1 carne 100g, queijo cheddar, frango, alface e tomate.',
         price: 25.0,
         category: 'Lanches',
         image: MaveFrangoImage,
-        available: true
+        available: true,
       },
       {
-        id: '3',
+        id: 'lanche-mave-calabresa',
         name: 'Mave Calabresa',
-        description: 'Pão brioche, 1 carne com 100 g, 2 camadas de queijo cheddar, calabresa, ovo, alface e tomate',
+        description:
+          'Pão brioche, 1 carne 100g, 2 camadas de cheddar, calabresa, ovo, alface e tomate.',
         price: 27.0,
         category: 'Lanches',
         image: MaveCalabresaImage,
-        available: true
+        available: true,
       },
       {
-        id: '1',
+        id: 'lanche-maverick',
         name: 'Maverick',
-        description: 'Pão brioche, 2 carnes com 100 g, 2 camadas de queijo cheddar, bacon, ovo, alface e tomate',
+        description:
+          'Pão brioche, 2 carnes 100g, 2 camadas de cheddar, bacon, ovo, alface e tomate.',
         price: 33.0,
         category: 'Lanches',
         image: MaverickImage,
-        available: true
+        available: true,
       },
-      
+
       // Combos
       {
-        id: '6',
+        id: 'combo-triplo-sargento',
         name: 'Triplo Sargento',
-        description: '3 deliciosos hamburgueres com pão brioche, carne artesanal com 100g, frango, bacon e queijo cheddar',
+        description:
+          '3 deliciosos hambúrgueres com pão brioche, carne artesanal 100g, frango, bacon e cheddar.',
         price: 49.0,
         category: 'Combos',
         image: TriploSargentoImage,
-        available: true
+        available: true,
       },
       {
-        id: '7',
+        id: 'combo-major',
         name: 'Major',
-        description: 'Pão brioche, 2 carnes com 150g, 1 frango empanado, bacon, queijo cheddar e batata frita com cheddar',
+        description:
+          'Pão brioche, 2 carnes 150g, 1 frango empanado, bacon, cheddar e batata frita com cheddar.',
         price: 40.0,
         category: 'Combos',
         image: MajorImage,
-        available: true
+        available: true,
       },
       {
-        id: '13',
+        id: 'combo-capitao-do-mar',
         name: 'Capitão do Mar',
-        description: 'Pão brioche, 1 carne de 100g, cream cheese, camarão e uma coca-cola em lata.',
+        description: 'Pão brioche, 1 carne 100g, cream cheese, camarão e uma Coca-Cola lata.',
         price: 37.0,
         category: 'Combos',
         image: CapitaoDoMarImage,
-        available: true
+        available: true,
       },
       {
-        id: '5',
+        id: 'combo-rasante',
         name: 'Combo Rasante',
-        description: '3 deliciosos hambúrgueres gourmet com carne de 100g, frango, bacon, queijo cheddar, batata M e uma Guaraná Antarctica de 1L',
+        description:
+          '3 hambúrgueres gourmet (carne 100g, frango, bacon, cheddar), batata M e Guaraná Antarctica 1L.',
         price: 70.0,
         category: 'Combos',
         image: ComboRasanteImage,
-        available: true
+        available: true,
       },
-      
+
       // Acompanhamentos
       {
-        id: '8',
+        id: 'acomp-batata-p',
         name: 'Batata P (250g)',
-        description: 'Porção pequena de batata frita crocante',
+        description: 'Porção pequena de batata frita crocante.',
         price: 15.0,
         category: 'Acompanhamentos',
         image: batatas,
-        available: true
+        available: true,
       },
       {
-        id: '9',
+        id: 'acomp-batata-m',
         name: 'Batata M (350g)',
-        description: 'Porção média de batata frita crocante',
+        description: 'Porção média de batata frita crocante.',
         price: 20.0,
         category: 'Acompanhamentos',
         image: batatas,
-        available: true
+        available: true,
       },
       {
-        id: '10',
+        id: 'acomp-batata-g',
         name: 'Batata G (500g)',
-        description: 'Porção grande de batata frita crocante',
+        description: 'Porção grande de batata frita crocante.',
         price: 30.0,
         category: 'Acompanhamentos',
         image: batatas,
-        available: true
+        available: true,
       },
-      
+
       // Bebidas
       {
-        id: '15',
+        id: 'bebida-coca-lata',
         name: 'Coca-Cola Lata',
-        description: 'Refrigerante Coca-Cola em lata 350ml',
+        description: 'Refrigerante Coca-Cola lata 350ml.',
         price: 5.0,
         category: 'Bebidas',
         image: cocalata,
-        available: true
+        available: true,
       },
       {
-        id: '16',
+        id: 'bebida-guarana-lata',
         name: 'Guaraná Antarctica Lata',
-        description: 'Refrigerante Guaraná Antarctica em lata 350ml',
+        description: 'Refrigerante Guaraná Antarctica lata 350ml.',
         price: 5.0,
         category: 'Bebidas',
         image: guaranalata,
-        available: true
+        available: true,
       },
       {
-        id: '17',
+        id: 'bebida-coca-1l',
         name: 'Coca-Cola 1L',
-        description: 'Refrigerante Coca-Cola 1L',
+        description: 'Refrigerante Coca-Cola 1L.',
         price: 8.0,
         category: 'Bebidas',
         image: cocalitro,
-        available: true
+        available: true,
       },
       {
-        id: '18',
+        id: 'bebida-guarana-1l',
         name: 'Guaraná Antarctica 1L',
-        description: 'Refrigerante Guaraná Antarctica 1 litro',
+        description: 'Refrigerante Guaraná Antarctica 1L.',
         price: 8.0,
         category: 'Bebidas',
         image: guaranalitro,
-        available: true
-      }
+        available: true,
+      },
     ];
+
     setProducts(mockProducts);
   }, []);
 
   const handleAddToCart = (product: Product) => {
     if (product.available) {
+      // Ajuste aqui se seu CartContext espera um tipo diferente (CartItem).
       addToCart({ ...product, quantity: 1 });
     }
   };
@@ -351,26 +375,26 @@ const Home: React.FC = () => {
     setFullscreenImage(null);
   };
 
-  const categories = Array.from(new Set(products.map(product => product.category)));
+  const categories = Array.from(new Set(products.map((p) => p.category)));
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const categoryOrder = ['Lanches', 'Combos', 'Acompanhamentos', 'Bebidas'];
-  const sortedCategories = categories.sort((a, b) => 
-    categoryOrder.indexOf(a) - categoryOrder.indexOf(b)
+  const sortedCategories = categories.sort(
+    (a, b) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b)
   );
 
   return (
     <div>
       <Header cartItemCount={cartItemCount} />
       <PageContainer>
-        {sortedCategories.map(category => (
+        {sortedCategories.map((category) => (
           <CategoryContainer key={category}>
             <CategoryTitle>{category}</CategoryTitle>
             <ProductsGrid>
               {products
-                .filter(product => product.category === category)
+                .filter((product) => product.category === category)
                 .sort((a, b) => a.price - b.price)
-                .map(product => (
+                .map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
@@ -383,11 +407,11 @@ const Home: React.FC = () => {
         ))}
       </PageContainer>
 
-      {/* Modal de imagem em tela cheia */}
+      {/* Modal: imagem em tela cheia */}
       {fullscreenImage && (
         <FullscreenImageModal onClick={closeModals}>
-          <FullscreenImage 
-            src={fullscreenImage} 
+          <FullscreenImage
+            src={fullscreenImage}
             alt="Produto em tela cheia"
             onClick={(e) => e.stopPropagation()}
           />
@@ -395,7 +419,7 @@ const Home: React.FC = () => {
         </FullscreenImageModal>
       )}
 
-      {/* Modal de detalhes do produto */}
+      {/* Modal: detalhes do produto */}
       {selectedProduct && (
         <ProductModalOverlay onClick={closeModals}>
           <ProductModalContent onClick={(e) => e.stopPropagation()}>
@@ -406,7 +430,7 @@ const Home: React.FC = () => {
               <ModalTitle>{selectedProduct.name}</ModalTitle>
               <ModalDescription>{selectedProduct.description}</ModalDescription>
               <ModalPrice>R$ {selectedProduct.price.toFixed(2)}</ModalPrice>
-              <ModalButton 
+              <ModalButton
                 onClick={() => {
                   handleAddToCart(selectedProduct);
                   closeModals();
