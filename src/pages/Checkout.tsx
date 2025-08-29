@@ -1,3 +1,4 @@
+// src/pages/Checkout.tsx
 import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -6,7 +7,7 @@ import { FaCreditCard, FaMoneyBillWave, FaQrcode, FaCopy } from 'react-icons/fa'
 import { RiBankCard2Line } from 'react-icons/ri';
 import Header from '../components/Header';
 import { useCart } from '../contexts/CartContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { CartItem } from '../types';
 
 const FormContainer = styled.div`
@@ -28,7 +29,7 @@ const FormGroup = styled.div`
 const Label = styled.label`
   display: block;
   margin-bottom: 8px;
-  font-weight: 501;
+  font-weight: 600;
 `;
 
 const Input = styled(Field)`
@@ -146,26 +147,57 @@ const ChangeForInput = styled.div`
   }
 `;
 
+/** Observações (edição no checkout) */
+const ObsContainer = styled.div`
+  margin-top: 16px;
+`;
+
+const ObsTextarea = styled.textarea`
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+
+  &:focus {
+    border-color: #ea1d2c;
+    box-shadow: 0 0 0 3px rgba(234, 29, 44, 0.08);
+  }
+`;
+
 type PaymentMethod = {
-  id: string;
+  id: 'credit' | 'debit' | 'pix' | 'cash';
   label: string;
   icon: React.ReactNode;
 };
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { cart } = useCart();
   const typedCart = cart as CartItem[];
 
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod['id'] | null>(null);
   const [selectedCardBrand, setSelectedCardBrand] = useState<string | null>(null);
   const [copiedPix, setCopiedPix] = useState(false);
 
+  /** Observações recebidas do Carrinho (state ou sessionStorage) */
+  const initialOrderNote =
+    (location.state as any)?.orderNote ??
+    sessionStorage.getItem('order_note') ??
+    '';
+
+  const [orderNote, setOrderNote] = useState<string>(initialOrderNote);
+  const MAX_OBS_CHARS = 280;
+
   const paymentMethods: PaymentMethod[] = [
     { id: 'credit', label: 'Crédito', icon: <FaCreditCard /> },
-    { id: 'debit', label: 'Débito', icon: <RiBankCard2Line /> },
-    { id: 'pix', label: 'PIX', icon: <FaQrcode /> },
-    { id: 'cash', label: 'Dinheiro', icon: <FaMoneyBillWave /> },
+    { id: 'debit',  label: 'Débito',  icon: <RiBankCard2Line /> },
+    { id: 'pix',    label: 'PIX',     icon: <FaQrcode /> },
+    { id: 'cash',   label: 'Dinheiro',icon: <FaMoneyBillWave /> },
   ];
 
   const cardBrands = [
@@ -176,6 +208,7 @@ const Checkout: React.FC = () => {
     { id: 'hipercard', name: 'Hipercard' },
   ];
 
+  /** ATENÇÃO: Aqui está fixo; se desejar, traga o frete escolhido do Carrinho via state/sessionStorage. */
   const DELIVERY_FEE = 5;
   const PIX_KEY = '60.654.740/0001-73';
 
@@ -190,6 +223,9 @@ const Checkout: React.FC = () => {
   };
 
   const handleSubmit = (values: any) => {
+    // persiste observação para próximos passos (se o usuário voltar)
+    sessionStorage.setItem('order_note', orderNote);
+
     const total = calculateTotal();
     const changeFor = selectedPaymentMethod === 'cash' ? parseFloat(values.changeFor) : 0;
     const changeAmount = changeFor - total;
@@ -202,7 +238,7 @@ const Checkout: React.FC = () => {
         phone: values.phone,
       },
       payment: {
-        method: selectedPaymentMethod as 'credit' | 'debit' | 'pix' | 'cash',
+        method: selectedPaymentMethod as PaymentMethod['id'],
         cardBrand:
           selectedPaymentMethod === 'credit' || selectedPaymentMethod === 'debit'
             ? selectedCardBrand
@@ -212,6 +248,7 @@ const Checkout: React.FC = () => {
       },
       items: typedCart,
       total: total,
+      note: orderNote || undefined, // inclui observação no pedido
     };
 
     sendOrderToWhatsApp(order);
@@ -219,7 +256,7 @@ const Checkout: React.FC = () => {
   };
 
   const sendOrderToWhatsApp = (order: any) => {
-    const phoneNumber = '557996718008';
+    const phoneNumber = '557996718008'; // número que recebe os pedidos
     const message = formatOrderMessage(order);
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
@@ -230,7 +267,7 @@ const Checkout: React.FC = () => {
     let message = `*NOVO PEDIDO* 🚀\n\n`;
     message += `*Cliente:* ${order.customer.name}\n`;
     message += `*Endereço:* ${order.customer.address}\n`;
-    message += `*Complemento:* ${order.customer.complement}\n`;
+    message += `*Complemento:* ${order.customer.complement || '-'}\n`;
     message += `*Telefone:* ${order.customer.phone}\n\n`;
     message += `*Itens:*\n`;
 
@@ -239,7 +276,7 @@ const Checkout: React.FC = () => {
     });
 
     message += `\n*Taxa de entrega:* R$ ${DELIVERY_FEE.toFixed(2)}\n`;
-    message += `*Total:* R$ ${order.total.toFixed(2)}\n\n`;
+    message += `*Total:* R$ ${order.total.toFixed(2)}\n`;
     message += `*Pagamento:* ${getPaymentMethodLabel(order.payment.method)}\n`;
 
     if (order.payment.method === 'credit' || order.payment.method === 'debit') {
@@ -252,11 +289,15 @@ const Checkout: React.FC = () => {
       message += `Por favor, envie o comprovante de pagamento para confirmarmos seu pedido.\n`;
     }
 
+    if (order.note) {
+      message += `\n*Observações:* ${order.note}\n`;
+    }
+
     message += `\nObrigado pelo pedido! 🎉`;
     return message;
   };
 
-  const getPaymentMethodLabel = (method: string) => {
+  const getPaymentMethodLabel = (method: PaymentMethod['id']) => {
     const pm = paymentMethods.find(pm => pm.id === method);
     return pm ? pm.label : method;
   };
@@ -366,7 +407,7 @@ const Checkout: React.FC = () => {
                   <PixContainer>
                     <p>Chave PIX Copia e Cola:</p>
                     <PixCode>{PIX_KEY}</PixCode>
-                    <CopyButton onClick={copyPixToClipboard}>
+                    <CopyButton type="button" onClick={copyPixToClipboard}>
                       <FaCopy />
                       {copiedPix ? 'Copiado!' : 'Copiar PIX'}
                     </CopyButton>
@@ -391,6 +432,23 @@ const Checkout: React.FC = () => {
                     </p>
                   </>
                 )}
+
+                {/* Observações (vêm do carrinho e podem ser editadas aqui) */}
+                <FormGroup>
+                  <Label htmlFor="order-note">Observações do pedido</Label>
+                  <ObsContainer>
+                    <ObsTextarea
+                      id="order-note"
+                      placeholder="Ex.: tirar cebola, ponto da carne, maionese à parte..."
+                      maxLength={MAX_OBS_CHARS}
+                      value={orderNote}
+                      onChange={(e) => setOrderNote(e.target.value.slice(0, MAX_OBS_CHARS))}
+                    />
+                    <div style={{ textAlign: 'right', fontSize: 12, color: '#666' }}>
+                      {orderNote.length}/{MAX_OBS_CHARS} caracteres
+                    </div>
+                  </ObsContainer>
+                </FormGroup>
 
                 <button
                   type="submit"
