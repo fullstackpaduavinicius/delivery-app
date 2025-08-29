@@ -1,3 +1,4 @@
+// src/pages/Cart.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiTrash2, FiPlus, FiMinus, FiChevronDown } from 'react-icons/fi';
@@ -133,43 +134,84 @@ const SelectIcon = styled.div`
   pointer-events: none;
 `;
 
+/** ---------- Campo de Observações ---------- */
+const ObservationContainer = styled.div`
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+`;
+
+const ObsLabel = styled.label`
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+`;
+
+const ObsTextarea = styled.textarea`
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+
+  &:focus {
+    border-color: #ea1d2c;
+    box-shadow: 0 0 0 3px rgba(234, 29, 44, 0.08);
+  }
+`;
+
+const ObsHelper = styled.div`
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+`;
+
 const Cart: React.FC = () => {
   const navigate = useNavigate();
   const { cart, updateCart } = useCart();
-  const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
 
-  // Dados dos bairros e seus respectivos fretes
+  /** bairros e fretes */
   const neighborhoods = [
-  { name: 'Selecione seu bairro', deliveryFee: 0 },
-  { name: 'Novo Paraíso', deliveryFee: 3.00 },
-  { name: 'Bairro América', deliveryFee: 3.00 },
-  { name: 'José Conrado de Araújo', deliveryFee: 3.00 },
-  { name: 'Jardim Centenário', deliveryFee: 4.00 },
-  { name: 'Santos Dumont', deliveryFee: 4.00 },
-  { name: '18 do Forte', deliveryFee: 5.00 },
-  { name: 'Siqueira Campos', deliveryFee: 3.00 },
-  { name: 'Getúlio Vargas', deliveryFee: 4.00 },
-  { name: 'Santo Antônio', deliveryFee: 6.00 },
-  { name: 'Suíça', deliveryFee: 6.00 },
-  { name: 'Palestina', deliveryFee: 6.00 },
-  { name: 'Industrial', deliveryFee: 6.00 },
-  { name: 'Cirurgia', deliveryFee: 4.00 },
-  { name: 'São José', deliveryFee: 6.00 },
-  { name: 'Jabotiana', deliveryFee: 7.00 },
-  { name: 'Ponto Novo', deliveryFee: 5.00 },
-  { name: 'Luzia', deliveryFee: 5.00 },
-  { name: 'Jardins', deliveryFee: 7.00 },
-  { name: 'Treze de Julho', deliveryFee: 7.00 },
-  { name: 'Cidade Nova', deliveryFee: 6.00 },
-  { name: 'Capucho', deliveryFee: 5.00 },
-  { name: 'Olaria', deliveryFee: 4.00 },
-  { name: 'Rosa Elze', deliveryFee: 4.00 },
-  { name: 'Castelo Branco', deliveryFee: 4.00 },
-];
+    { name: 'Selecione seu bairro', deliveryFee: 0 },
+    { name: 'Novo Paraíso', deliveryFee: 3.0 },
+    { name: 'Bairro América', deliveryFee: 3.0 },
+    { name: 'José Conrado de Araújo', deliveryFee: 3.0 },
+    { name: 'Jardim Centenário', deliveryFee: 4.0 },
+    { name: 'Santos Dumont', deliveryFee: 4.0 },
+    { name: '18 do Forte', deliveryFee: 5.0 },
+    { name: 'Siqueira Campos', deliveryFee: 3.0 },
+    { name: 'Getúlio Vargas', deliveryFee: 4.0 },
+    { name: 'Santo Antônio', deliveryFee: 6.0 },
+    { name: 'Suíça', deliveryFee: 6.0 },
+    { name: 'Palestina', deliveryFee: 6.0 },
+    { name: 'Industrial', deliveryFee: 6.0 },
+    { name: 'Cirurgia', deliveryFee: 4.0 },
+    { name: 'São José', deliveryFee: 6.0 },
+    { name: 'Jabotiana', deliveryFee: 7.0 },
+    { name: 'Ponto Novo', deliveryFee: 5.0 },
+    { name: 'Luzia', deliveryFee: 5.0 },
+    { name: 'Jardins', deliveryFee: 7.0 },
+    { name: 'Treze de Julho', deliveryFee: 7.0 },
+    { name: 'Cidade Nova', deliveryFee: 6.0 },
+    { name: 'Capucho', deliveryFee: 5.0 },
+    { name: 'Olaria', deliveryFee: 4.0 },
+    { name: 'Rosa Elze', deliveryFee: 4.0 },
+    { name: 'Castelo Branco', deliveryFee: 4.0 },
+  ];
 
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
+  const [orderNote, setOrderNote] = useState<string>(() => {
+    return sessionStorage.getItem('order_note') || '';
+  });
+  const MAX_OBS_CHARS = 280;
 
   const handleIncreaseQuantity = (productId: string) => {
-    const updatedCart = cart.map(item =>
+    const updatedCart = cart.map((item) =>
       item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
     );
     updateCart(updatedCart);
@@ -177,15 +219,15 @@ const Cart: React.FC = () => {
 
   const handleDecreaseQuantity = (productId: string) => {
     const updatedCart = cart
-      .map(item =>
+      .map((item) =>
         item.id === productId ? { ...item, quantity: Math.max(1, item.quantity - 1) } : item
       )
-      .filter(item => item.quantity > 0);
+      .filter((item) => item.quantity > 0);
     updateCart(updatedCart);
   };
 
   const handleRemoveItem = (productId: string) => {
-    const updatedCart = cart.filter(item => item.id !== productId);
+    const updatedCart = cart.filter((item) => item.id !== productId);
     updateCart(updatedCart);
   };
 
@@ -195,7 +237,7 @@ const Cart: React.FC = () => {
 
   const getDeliveryFee = () => {
     if (!selectedNeighborhood) return 0;
-    const neighborhood = neighborhoods.find(n => n.name === selectedNeighborhood);
+    const neighborhood = neighborhoods.find((n) => n.name === selectedNeighborhood);
     return neighborhood ? neighborhood.deliveryFee : 0;
   };
 
@@ -203,12 +245,20 @@ const Cart: React.FC = () => {
     return calculateSubtotal() + getDeliveryFee();
   };
 
+  const handleObsChange = (value: string) => {
+    const text = value.slice(0, MAX_OBS_CHARS);
+    setOrderNote(text);
+    sessionStorage.setItem('order_note', text);
+  };
+
   const proceedToCheckout = () => {
     if (!selectedNeighborhood || selectedNeighborhood === 'Selecione seu bairro') {
       alert('Por favor, selecione seu bairro para continuar');
       return;
     }
-    navigate('/checkout');
+    // garante que a observação vai para a próxima página
+    sessionStorage.setItem('order_note', orderNote);
+    navigate('/checkout', { state: { orderNote } });
   };
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -219,7 +269,7 @@ const Cart: React.FC = () => {
       <div className="container">
         <CartContainer>
           <h2>Seu Carrinho</h2>
-          
+
           {cart.length === 0 ? (
             <p>Seu carrinho está vazio</p>
           ) : (
@@ -233,7 +283,10 @@ const Cart: React.FC = () => {
                   >
                     {neighborhoods.map((neighborhood) => (
                       <option key={neighborhood.name} value={neighborhood.name}>
-                        {neighborhood.name} {neighborhood.deliveryFee > 0 ? `(Frete: R$ ${neighborhood.deliveryFee.toFixed(2)})` : ''}
+                        {neighborhood.name}{' '}
+                        {neighborhood.deliveryFee > 0
+                          ? `(Frete: R$ ${neighborhood.deliveryFee.toFixed(2)})`
+                          : ''}
                       </option>
                     ))}
                   </Select>
@@ -243,7 +296,7 @@ const Cart: React.FC = () => {
                 </SelectWrapper>
               </NeighborhoodSelector>
 
-              {cart.map(item => (
+              {cart.map((item) => (
                 <CartItemCard key={item.id}>
                   <ItemInfo>
                     <ItemImage src={item.image} alt={item.name} />
@@ -269,6 +322,21 @@ const Cart: React.FC = () => {
                 </CartItemCard>
               ))}
 
+              {/* Observações do pedido */}
+              <ObservationContainer>
+                <ObsLabel htmlFor="order-note">Observações do pedido</ObsLabel>
+                <ObsTextarea
+                  id="order-note"
+                  placeholder="Ex.: tirar cebola, ponto da carne, maionese à parte..."
+                  value={orderNote}
+                  onChange={(e) => handleObsChange(e.target.value)}
+                  maxLength={MAX_OBS_CHARS}
+                />
+                <ObsHelper>
+                  {orderNote.length}/{MAX_OBS_CHARS} caracteres
+                </ObsHelper>
+              </ObservationContainer>
+
               <Summary>
                 <SummaryRow>
                   <span>Subtotal</span>
@@ -277,17 +345,17 @@ const Cart: React.FC = () => {
                 <SummaryRow>
                   <span>Taxa de entrega</span>
                   <span>
-                    {selectedNeighborhood && selectedNeighborhood !== 'Selecione seu bairro' ? 
-                      `R$ ${getDeliveryFee().toFixed(2)}` : 
-                      'Selecione um bairro'}
+                    {selectedNeighborhood && selectedNeighborhood !== 'Selecione seu bairro'
+                      ? `R$ ${getDeliveryFee().toFixed(2)}`
+                      : 'Selecione um bairro'}
                   </span>
                 </SummaryRow>
                 <TotalRow>
                   <span>Total</span>
                   <span>R$ {calculateTotal().toFixed(2)}</span>
                 </TotalRow>
-                <CheckoutButton 
-                  className="btn-primary" 
+                <CheckoutButton
+                  className="btn-primary"
                   onClick={proceedToCheckout}
                   disabled={!selectedNeighborhood || selectedNeighborhood === 'Selecione seu bairro'}
                 >
