@@ -204,7 +204,7 @@ const Cart: React.FC = () => {
     { name: 'Castelo Branco', deliveryFee: 4.0 },
   ];
 
-  const [selectedNeighborhood, setSelectedNeighborhood] = useState('');
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState('Selecione seu bairro');
   const [orderNote, setOrderNote] = useState<string>(() => {
     return sessionStorage.getItem('order_note') || '';
   });
@@ -252,13 +252,25 @@ const Cart: React.FC = () => {
   };
 
   const proceedToCheckout = () => {
+    const fee = getDeliveryFee();
+
     if (!selectedNeighborhood || selectedNeighborhood === 'Selecione seu bairro') {
       alert('Por favor, selecione seu bairro para continuar');
       return;
     }
-    // garante que a observação vai para a próxima página
+
+    // garante que tudo vai para a próxima página
     sessionStorage.setItem('order_note', orderNote);
-    navigate('/checkout', { state: { orderNote } });
+    sessionStorage.setItem('delivery_neighborhood', selectedNeighborhood);
+    sessionStorage.setItem('delivery_fee', String(fee));
+
+    navigate('/checkout', {
+      state: {
+        orderNote,
+        deliveryNeighborhood: selectedNeighborhood,
+        deliveryFee: fee,
+      },
+    });
   };
 
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);

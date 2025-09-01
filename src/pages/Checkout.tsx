@@ -184,7 +184,7 @@ const Checkout: React.FC = () => {
   const [selectedCardBrand, setSelectedCardBrand] = useState<string | null>(null);
   const [copiedPix, setCopiedPix] = useState(false);
 
-  /** Observações recebidas do Carrinho (state ou sessionStorage) */
+  // Observações recebidas do Carrinho (state ou sessionStorage)
   const initialOrderNote =
     (location.state as any)?.orderNote ??
     sessionStorage.getItem('order_note') ??
@@ -192,6 +192,33 @@ const Checkout: React.FC = () => {
 
   const [orderNote, setOrderNote] = useState<string>(initialOrderNote);
   const MAX_OBS_CHARS = 280;
+
+  // Bairro e Taxa vindos do Carrinho (state/sessionStorage) com fallback seguro
+  const deliveryNeighborhood =
+    (location.state as any)?.deliveryNeighborhood ??
+    sessionStorage.getItem('delivery_neighborhood') ??
+    '';
+
+  const deliveryFee: number = (() => {
+    const fromState = (location.state as any)?.deliveryFee;
+    if (typeof fromState === 'number') return fromState;
+    const stored = sessionStorage.getItem('delivery_fee');
+    const parsed = stored ? parseFloat(stored) : NaN;
+    return Number.isFinite(parsed) ? parsed : 0;
+  })();
+
+  const PIX_KEY = '60.654.740/0001-73';
+
+  const calculateSubtotal = () =>
+    typedCart.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0);
+
+  const calculateTotal = () => calculateSubtotal() + deliveryFee;
+
+  const copyPixToClipboard = () => {
+    navigator.clipboard.writeText(PIX_KEY);
+    setCopiedPix(true);
+    setTimeout(() => setCopiedPix(false), 2000);
+  };
 
   const paymentMethods: PaymentMethod[] = [
     { id: 'credit', label: 'Crédito', icon: <FaCreditCard /> },
@@ -208,23 +235,16 @@ const Checkout: React.FC = () => {
     { id: 'hipercard', name: 'Hipercard' },
   ];
 
-  /** ATENÇÃO: Aqui está fixo; se desejar, traga o frete escolhido do Carrinho via state/sessionStorage. */
-  const DELIVERY_FEE = 5;
-  const PIX_KEY = '60.654.740/0001-73';
-
-  const calculateTotal = () => {
-    return typedCart.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0) + DELIVERY_FEE;
-  };
-
-  const copyPixToClipboard = () => {
-    navigator.clipboard.writeText(PIX_KEY);
-    setCopiedPix(true);
-    setTimeout(() => setCopiedPix(false), 2000);
+  const getPaymentMethodLabel = (method: PaymentMethod['id']) => {
+    const pm = paymentMethods.find(pm => pm.id === method);
+    return pm ? pm.label : method;
   };
 
   const handleSubmit = (values: any) => {
-    // persiste observação para próximos passos (se o usuário voltar)
+    // persiste para caso o usuário volte
     sessionStorage.setItem('order_note', orderNote);
+    sessionStorage.setItem('delivery_neighborhood', deliveryNeighborhood);
+    sessionStorage.setItem('delivery_fee', String(deliveryFee));
 
     const total = calculateTotal();
     const changeFor = selectedPaymentMethod === 'cash' ? parseFloat(values.changeFor) : 0;
@@ -237,6 +257,10 @@ const Checkout: React.FC = () => {
         complement: values.complement,
         phone: values.phone,
       },
+      delivery: {
+        neighborhood: deliveryNeighborhood || undefined,
+        fee: deliveryFee,
+      },
       payment: {
         method: selectedPaymentMethod as PaymentMethod['id'],
         cardBrand:
@@ -247,8 +271,9 @@ const Checkout: React.FC = () => {
         changeAmount: selectedPaymentMethod === 'cash' ? changeAmount : undefined,
       },
       items: typedCart,
-      total: total,
-      note: orderNote || undefined, // inclui observação no pedido
+      subtotal: calculateSubtotal(),
+      total,
+      note: orderNote || undefined,
     };
 
     sendOrderToWhatsApp(order);
@@ -268,14 +293,18 @@ const Checkout: React.FC = () => {
     message += `*Cliente:* ${order.customer.name}\n`;
     message += `*Endereço:* ${order.customer.address}\n`;
     message += `*Complemento:* ${order.customer.complement || '-'}\n`;
-    message += `*Telefone:* ${order.customer.phone}\n\n`;
-    message += `*Itens:*\n`;
+    message += `*Telefone:* ${order.customer.phone}\n`;
+    if (order.delivery?.neighborhood) {
+      message += `*Bairro:* ${order.delivery.neighborhood}\n`;
+    }
+    message += `\n*Itens:*\n`;
 
     order.items.forEach((item: CartItem) => {
       message += `- ${item.name} (${item.quantity}x) - R$ ${(item.price * item.quantity).toFixed(2)}\n`;
     });
 
-    message += `\n*Taxa de entrega:* R$ ${DELIVERY_FEE.toFixed(2)}\n`;
+    message += `\n*Subtotal:* R$ ${order.subtotal.toFixed(2)}\n`;
+    message += `*Taxa de entrega:* R$ ${order.delivery.fee.toFixed(2)}\n`;
     message += `*Total:* R$ ${order.total.toFixed(2)}\n`;
     message += `*Pagamento:* ${getPaymentMethodLabel(order.payment.method)}\n`;
 
@@ -295,11 +324,6 @@ const Checkout: React.FC = () => {
 
     message += `\nObrigado pelo pedido! 🎉`;
     return message;
-  };
-
-  const getPaymentMethodLabel = (method: PaymentMethod['id']) => {
-    const pm = paymentMethods.find(pm => pm.id === method);
-    return pm ? pm.label : method;
   };
 
   const validationSchema = Yup.object().shape({
@@ -324,6 +348,38 @@ const Checkout: React.FC = () => {
       <div className="container">
         <FormContainer>
           <FormTitle>Finalizar Pedido</FormTitle>
+
+          {/* Resumo do pedido (opcional, mas recomendado) */}
+          <div
+            style={{
+              background: '#fff',
+              border: '1px solid #eee',
+              borderRadius: 8,
+              padding: 16,
+              marginBottom: 16,
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span>Subtotal</span>
+              <strong>R$ {calculateSubtotal().toFixed(2)}</strong>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span>Entrega{deliveryNeighborhood ? ` — ${deliveryNeighborhood}` : ''}</span>
+              <strong>R$ {deliveryFee.toFixed(2)}</strong>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                borderTop: '1px solid #eee',
+                paddingTop: 8,
+                fontSize: 18,
+              }}
+            >
+              <span>Total</span>
+              <strong>R$ {calculateTotal().toFixed(2)}</strong>
+            </div>
+          </div>
 
           <Formik
             initialValues={{
